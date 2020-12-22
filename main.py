@@ -2,22 +2,24 @@ import sys
 import cv2
 import os
 
-if __name__ == '__main__':
-    args = sys.argv
-    # print(args[0], "******", args[1])
-    path = args[1]
-    seg = args[1].split("/")
 
+def target_file(inp):
+    path = inp[1]
+    seg = inp[1].split("/")
     output_file = seg[5] + "_" + seg[6] + "_" + seg[7] + ".avi"
     files = os.listdir(path)
     files = [file for file in files if 'png' in file]
-    print(files)
-    print(len(files))
 
+    tmp = cv2.imread(path + '/0.png')
+    print(tmp.shape)
+
+    return [path, files, tmp, output_file]
+
+
+def generate_video(path, files, img_info, output):
     codecs = 'H264'
-    # encoder = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     encoder = cv2.VideoWriter_fourcc(*codecs)
-    video = cv2.VideoWriter(output_file, encoder, 20.0, (768, 966))
+    video = cv2.VideoWriter(output, encoder, 20.0, (img_info.shape[1], img_info.shape[0]))
 
     if not video.isOpened():
         print("cannot be opened")
@@ -35,3 +37,8 @@ if __name__ == '__main__':
 
     video.release()
     print("written")
+
+
+if __name__ == '__main__':
+    info = target_file(sys.argv)
+    generate_video(info[0], info[1], info[2], info[3])
